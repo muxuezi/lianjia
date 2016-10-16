@@ -24,6 +24,9 @@ class LinkedHome(object):
 
     parameters
     ==========
+    params : str
+        筛选条件，具体参数在官网查询
+        例如：sf1co21tf1p4p5表示“价格300-500万之间、满五唯一/满二的普通住宅”
     field : dict
         可选区域：东城, 西城, 朝阳, 海淀, 丰台, 石景山, 
         通州, 昌平, 大兴, 亦庄开发区, 顺义, 房山, 门头沟, 
@@ -47,6 +50,7 @@ class LinkedHome(object):
     """
 
     def __init__(self, field:str):
+        self.params = 'sf1co21tf1p4p5'
         self.field = {'dongcheng': '东城',
                       'xicheng': '西城',
                       'chaoyang': '朝阳',
@@ -68,7 +72,7 @@ class LinkedHome(object):
 
         self.field_name = self.field.get(field, '')
         self.header = 'http://bj.lianjia.com/ershoufang/{}'.format(field)
-        self.first_url = self.header + '/pg1' + 'sf1co21tf1lc1lc2l2p4p5'
+        self.first_url = self.header + '/pg1' + self.params
         self.page_all = int
         self.page_info = list
         self.sem = asyncio.Semaphore(10)
@@ -148,7 +152,7 @@ class LinkedHome(object):
             page number
         '''
         with (await self.sem):
-            url = self.header + '/pg{}sf1co21tf1lc1lc2l2p4p5'.format(p)
+            url = self.header + '/pg{}'.format(p) + self.params
             response = await aiohttp.request('GET', url, headers=self.headers, compress=True)
             page = await response.text(encoding='utf-8')
             tree = html.fromstring(page)
